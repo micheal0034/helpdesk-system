@@ -69,7 +69,8 @@ Components are separated into `app/services`, `app/retrieval`, `app/embedding`, 
 1. **Clone the Repository**
 
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/micheal0034/helpdesk-system.git
+   
    cd helpdesk-system
    ```
 2. **Create & Activate Virtual Environment**
@@ -87,7 +88,7 @@ Components are separated into `app/services`, `app/retrieval`, `app/embedding`, 
 
 ## Configuration
 
-1. **Create a `.env` file** in the project root with the following keys:  fileciteturn1file0
+1. **Create a `.env` file** in the project root with the following keys:
 
    ```ini
    AZURE_OPENAI_NAME="AzureAI"
@@ -252,8 +253,6 @@ This document provides a focused overview of how each core component in the help
   with open(settings.CATEGORIES_PATH) as f:
       categories = json.load(f)
   self.category_embeddings = embed_text([c["description"] for c in categories])
-  ```  fileciteturn1file12L13-L20
-
   ````
 * **Prediction**:
 
@@ -264,8 +263,6 @@ This document provides a focused overview of how each core component in the help
   sims = cosine_similarity(request_emb, self.category_embeddings)
   best_idx = np.argmax(sims)
   label, confidence = categories[best_idx]["name"], sims[best_idx]
-  ```  fileciteturn1file12L33-L40
-
   ````
 * **Escalation Check**:
 
@@ -276,7 +273,6 @@ This document provides a focused overview of how each core component in the help
       # Check trigger embeddings
       trig_sims = cosine_similarity(emb, self.trigger_embeddings)
       return any(trig_sims >= trigger_threshold)
-  ```  fileciteturn1file12L46-L56
   ````
 
 ---
@@ -286,7 +282,7 @@ This document provides a focused overview of how each core component in the help
 * **Index Building**:
 
   * **File**: `scripts/build_index.py`
-  * **Process**: Load `.md` and `.json`, split into \~200-token overlapping chunks via `chunk_text()` in `app/retrieval/chunking.py`, embed chunks, and write FAISS index + metadata.  fileciteturn1file17L40-L47
+  * **Process**: Load `.md` and `.json`, split into \~200-token overlapping chunks via `chunk_text()` in `app/retrieval/chunking.py`, embed chunks, and write FAISS index + metadata.
 
 * **Query Search**:
 
@@ -296,7 +292,6 @@ This document provides a focused overview of how each core component in the help
   # Search FAISS
   distances, indices = faiss_index.search(q_emb.reshape(1, -1), k)
   results = [metadata[i] for i in indices[0]]
-  ```  fileciteturn1file13L15-L21
   ````
 
 ---
@@ -306,7 +301,7 @@ This document provides a focused overview of how each core component in the help
 * **Prompt Construction**:
 
   * **File**: `app/prompts/builder.py`
-  * **Logic**: Combine a fixed system message, classification details, retrieved snippets, and the original question into one prompt.  fileciteturn1file18L11-L19
+  * **Logic**: Combine a fixed system message, classification details, retrieved snippets, and the original question into one prompt.
 
 * **LLM Call**:
 
@@ -321,7 +316,6 @@ This document provides a focused overview of how each core component in the help
       max_tokens=512
   )
   answer = response.choices[0].message.content.strip()
-  ```  fileciteturn1file14L30-L36
   ````
 
 ---
@@ -329,8 +323,7 @@ This document provides a focused overview of how each core component in the help
 ## 4. Escalation Logic
 
 * **File**: `app/services/classifier.py`
-* **Details**: Implemented in the `_should_escalate()` method, checking both confidence and trigger thresholds as described above.  fileciteturn1file12L46-L56
+* **Details**: Implemented in the `_should_escalate()` method, checking both confidence and trigger thresholds as described above.  
 
 ---
 
-*End of component-specific README.*
