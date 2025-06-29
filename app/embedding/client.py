@@ -2,7 +2,8 @@
 
 import numpy as np
 from typing import List
-from openai import AzureOpenAI
+from openai import OpenAI
+# from openai import AzureOpenAI
 from sentence_transformers import SentenceTransformer
 from app.core.config import settings
 
@@ -16,10 +17,15 @@ AZURE_ENDPOINT = settings.AZURE_OPENAI_ENDPOINT
 AZURE_NAME = settings.AZURE_OPENAI_NAME
 AZURE_OPENAI_API_VERSION = settings.AZURE_OPENAI_API_VERSION
 
-_client = AzureOpenAI(
+# _client = AzureOpenAI(
+#     api_key=AZURE_API_KEY,
+#     api_version=AZURE_OPENAI_API_VERSION,
+#     azure_endpoint=AZURE_ENDPOINT
+# )
+
+_client = OpenAI(
     api_key=AZURE_API_KEY,
-    api_version=AZURE_OPENAI_API_VERSION,
-    azure_endpoint=AZURE_ENDPOINT
+    base_url=AZURE_ENDPOINT,
 )
 
 def embed_text(text: str) -> np.ndarray:
@@ -27,13 +33,28 @@ def embed_text(text: str) -> np.ndarray:
     embedding = _embedding_model.encode(text)
     return np.array(embedding)
 
-def generate_response(prompt: str) -> str:
-    """Generate a response using Azure OpenAI."""
-    if not AZURE_DEPLOYMENT:
-        raise RuntimeError("AZURE_DEPLOYMENT_NAME is not set")
+# Using Azure OpenAI for response generation
+# def generate_response(prompt: str) -> str:
+#     """Generate a response using Azure OpenAI."""
+#     if not AZURE_DEPLOYMENT:
+#         raise RuntimeError("AZURE_DEPLOYMENT_NAME is not set")
     
+#     completion = _client.chat.completions.create(
+#         model=AZURE_NAME,
+#         messages=[
+#             {"role": "system", "content": "You are an expert IT help desk assistant."},
+#             {"role": "user", "content": prompt}
+#         ],
+#         temperature=0.3,
+#         max_tokens=500
+#     )
+#     return completion.choices[0].message.content.strip()
+
+# Using Groq OpenAI for response generation
+def generate_response(prompt: str) -> str:
+    """Generate a response using Groq OpenAI."""
     completion = _client.chat.completions.create(
-        model=AZURE_NAME,
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
         messages=[
             {"role": "system", "content": "You are an expert IT help desk assistant."},
             {"role": "user", "content": prompt}

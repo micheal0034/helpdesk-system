@@ -1,7 +1,7 @@
 // src/services/helpdesk.ts
 import axios from "axios";
 
-const API_BASE = "https://helpdesk-system-wizs.onrender.com/api/v1"; // Update if your backend is elsewhere
+const API_BASE = "https://helpdesk-system-wizs.onrender.com/`api/v1"; // Update if your backend is elsewhere
 
 export interface HelpRequest {
   text: string;
