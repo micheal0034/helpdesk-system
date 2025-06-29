@@ -1,7 +1,7 @@
 // src/services/helpdesk.ts
 import axios from "axios";
 
-const API_BASE = "https://helpdesk-system.railway.internal/api/v1"; // Update if your backend is elsewhere
+const API_BASE = "https://mikecode2you-helpdesk-system.hf.space/api/v1"; // Update if your backend is elsewhere
 
 export interface HelpRequest {
   text: string;
