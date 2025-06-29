@@ -7,7 +7,7 @@ from app.core.config import settings
 
 
 class RequestClassifier:
-    def __init__(self, path=None, threshold: float = 0.6, trigger_threshold: float = 0.7):
+    def __init__(self, path=None, threshold: float = 0.6, trigger_threshold: float = 0.4):
         path = path or settings.CATEGORIES_PATH
 
         with open(path, 'r') as f:
@@ -43,17 +43,17 @@ class RequestClassifier:
 
         return label, confidence, escalate
 
-    def _should_escalate(self, label: str, text_emb: np.ndarray, confidence: float) -> bool:
-        # Rule 1: Low classification confidence
-        if confidence < self.threshold:
-            return True
-
+    def _should_escalate(self, label: str, text_emb: np.ndarray, confidence: float) -> bool:        
         # Rule 2: High semantic similarity to any escalation trigger
         trigger_embs = self.trigger_embeddings.get(label, [])
         for trig_emb in trigger_embs:
             trig_sim = cosine_similarity([text_emb], [trig_emb])[0][0]
             if trig_sim >= self.trigger_threshold:
                 return True
+            
+        # # Rule 1: Low classification confidence
+        # if confidence < self.threshold:
+        #     return True
 
         return False
 
