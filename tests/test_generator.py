@@ -1,4 +1,4 @@
-# tests/test_generator.py
+
 from app.services.generator import generate_answer
 from app.models.schemas import HelpRequest, ClassificationResult, RetrievalResult
 

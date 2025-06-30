@@ -1,4 +1,4 @@
-# run_indexer.py
+
 from app.retrieval.indexer import Indexer
 
 if __name__ == "__main__":

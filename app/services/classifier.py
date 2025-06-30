@@ -30,7 +30,7 @@ class RequestClassifier:
     def predict(self, text: str):
         text_emb = embed_text(text)
 
-        # Step 1: Classify via semantic similarity to category description
+        # Classify via semantic similarity to category description
         similarities = {
             cat: cosine_similarity([text_emb], [emb])[0][0]
             for cat, emb in self.category_embeddings.items()
@@ -38,22 +38,18 @@ class RequestClassifier:
         label = max(similarities, key=similarities.get)
         confidence = similarities[label]
 
-        # Step 2: Check escalation
+        # Check escalation
         escalate = self._should_escalate(label, text_emb, confidence)
 
         return label, confidence, escalate
 
     def _should_escalate(self, label: str, text_emb: np.ndarray, confidence: float) -> bool:        
-        # Rule 2: High semantic similarity to any escalation trigger
+        # High semantic similarity to any escalation trigger
         trigger_embs = self.trigger_embeddings.get(label, [])
         for trig_emb in trigger_embs:
             trig_sim = cosine_similarity([text_emb], [trig_emb])[0][0]
             if trig_sim >= self.trigger_threshold:
                 return True
-            
-        # # Rule 1: Low classification confidence
-        # if confidence < self.threshold:
-        #     return True
 
         return False
 

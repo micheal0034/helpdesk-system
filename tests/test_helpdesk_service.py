@@ -1,4 +1,4 @@
-# tests/test_helpdesk_service.py
+
 from app.services.helpdesk import process_helpdesk_request
 
 def test_helpdesk_pipeline():

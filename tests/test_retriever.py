@@ -1,4 +1,4 @@
-# tests/test_retriever.py
+
 from app.services.retriever import retrieve_knowledge
 
 def test_retriever_returns_k_results():

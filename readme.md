@@ -1,3 +1,15 @@
+# 🧠 CodeMaster Reasoning Pipe
+
+**Version:** 0.0.1  
+**Author:** Michael Edekin  
+**Email:** [michealedekin@gmail.com](mailto:michealedekin@gmail.com)  
+**LinkedIn:** [@michael](https://www.linkedin.com/in/michaeledekin/)
+
+**Live app Link:**  [https://helpdesk-system-three.vercel.app/](https://helpdesk-system-three.vercel.app/)
+---
+<video controls src="bandicam 2025-06-30 08-17-29-776.mp4" title="Title"></video>
+
+
 # Intelligent Help Desk System
 
 An end-to-end, production‑ready AI-powered help desk pipeline that classifies user requests, retrieves relevant knowledge, and generates contextual responses.
@@ -9,6 +21,8 @@ An end-to-end, production‑ready AI-powered help desk pipeline that classifies 
 1. [Introduction](#introduction)
 2. [Features](#features)
 3. [Architecture Overview](#architecture-overview)
+  * [Component Implementation Details](#Component-Implementation-Details)
+  * [Approach & Workflow](#Approach-Workflow)
 4. [Prerequisites](#prerequisites)
 5. [Installation](#installation)
 6. [Configuration](#configuration)
@@ -47,168 +61,19 @@ This project implements a modular help desk system powered by AI components:
 
 ## Architecture Overview
 
-```
-User Request → [Classifier] → Category & Flags
-               → [Retriever] → Top‑k Context Snippets
-               → [Generator] → Azure OpenAI Chat → Final Answer
-               → [API Layer] → HTTP Response
-```
+
+![Architecture Diagram](architecture.png)
+
+
+
 
 Components are separated into `app/services`, `app/retrieval`, `app/embedding`, and `app/api` for maintainability.
 
-## Prerequisites
 
-* **Python 3.8+**
-* **git**, **pip**, and a virtual environment tool
-* **Azure OpenAI**
-* **FastAPI**
-* **Faiss**
+## Component Implementation Details
 
-## Installation
+This focused overview of how each core component in the help desk system is implemented, including the algorithms and file locations.
 
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/micheal0034/helpdesk-system.git
-   
-   cd helpdesk-system
-   ```
-2. **Create & Activate Virtual Environment**
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate    # macOS/Linux
-   venv\Scripts\activate     # Windows
-   ```
-3. **Install Dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Configuration
-
-1. **Create a `.env` file** in the project root with the following keys:
-
-   ```ini
-   AZURE_OPENAI_NAME="AzureAI"
-   AZURE_DEPLOYMENT_NAME="<your-deployment-name>"
-   AZURE_OPENAI_KEY="<your-key>"
-   AZURE_OPENAI_ENDPOINT="https://<your-endpoint>.openai.azure.com"
-   AZURE_OPENAI_API_VERSION="2023-09-01-preview"
-   INDEX_PATH="data/faiss.index"
-   CATEGORIES_PATH="app/models/categories.json"
-   DATA_DIR="uploads"
-
-
-   ```
-2. **Verify Settings Loader**
-   The `app/core/config.py` script will load and validate all required vars on startup.
-
-## Building the Knowledge Index
-
-Before serving requests, build the FAISS index:
-
-```bash
-python run_indexer.py
-```
-
-This will scan `data/*.md` and `data/*.json`, chunk text, embed, and write `data/faiss.index` and its metadata.
-
-## Running the Application
-
-### Local Development
-
-1. **Start the FastAPI Server**
-
-   ```bash
-   uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
-   ```
-2. **Access the API**
-
-   * Swagger UI: `http://localhost:8001/docs`
-   * Redoc: `http://localhost:8001/redoc`
-
-
-
-````
-
-## API Usage
-
-### Endpoints
-
-- **POST** `/classify`
-  - Payload: `{ "text": "Issue description" }`
-  - Response: `ClassificationResult` JSON
-
-- **POST** `/retrieve`
-  - Payload: `{ "text": "Your query" }`
-  - Response: `RetrievalResult` snippets
-
-- **POST** `/helpdesk`
-  - Payload: `{ "text": "Help me with ..." }`
-  - Response: `HelpResponse` containing classification, snippets, and answer
-
-### Example (cURL)
-```bash
-curl -X POST http://localhost:8000/helpdesk \
-     -H "Content-Type: application/json" \
-     -d '{"text":"I forgot my password"}'
-````
-
-## Testing
-
-Run the full test suite with pytest:
-
-```bash
-pytest -q
-```
-
-**Test Results**:
-
-````
-============================= test session starts =============================
-collected 5 items
-
-tests/test_helpdesk_service.py .                                         [ 20%]
-tests/test_retriever.py .                                               [ 40%]
-tests/test_api.py .                                                     [ 60%]
-tests/test_classifier.py .                                              [ 80%]
-tests/test_generator.py .                                               [100%]
-
-============================== 5 passed in 0.73s ==============================
-```## Logging & Monitoring
-
-- **Structured Logging**: Standard Python `logging` configured in each component.
-- **Timing Metrics**: Each pipeline stage logs duration for performance tuning.
-- **Log Level**: Set `LOG_LEVEL` in environment (default INFO).
-
-## Troubleshooting
-
-- **Index Not Found**: Ensure `data/faiss.index` exists or rebuild via `build_index.py`.
-- **Env Vars Missing**: Review `.env` and confirm keys; startup will error if required vars are unset.
-- **Azure Errors**: Verify deployment name and key in Azure portal.
-
-## Contributing
-
-1. Fork the repo and create a feature branch.
-2. Write tests for new functionality.
-3. Submit a pull request with clear descriptions.
-
-## License
-
-This project is licensed under the MIT License.
-
-````
-
-
-
-
-# Component Implementation Details for Intelligent Help Desk System
-
-This document provides a focused overview of how each core component in the help desk system is implemented, including the algorithms and file locations.
-
----
 
 ## Approach & Workflow
 
@@ -232,7 +97,7 @@ This document provides a focused overview of how each core component in the help
      * Classification summary (label, confidence, escalation flag).
      * Retrieved context snippets with source metadata.
      * The original user query.
-   * Invoke Azure OpenAI’s chat completion endpoint with controlled parameters to produce the final answer.
+   * Invoke OpenAI’s chat completion endpoint with controlled parameters to produce the final answer.
 
 4. **Escalation Logic**
 
@@ -241,7 +106,6 @@ This document provides a focused overview of how each core component in the help
      1. The top category similarity falls below `ESCALATION_THRESHOLD`.
      2. The request contains trigger words (e.g., “urgent”, “ASAP”) that exceed their own trigger thresholds.
 
----
 
 ## 1. Request Classification
 
@@ -250,29 +114,45 @@ This document provides a focused overview of how each core component in the help
 
   ````python
   # Load and embed categories
-  with open(settings.CATEGORIES_PATH) as f:
-      categories = json.load(f)
-  self.category_embeddings = embed_text([c["description"] for c in categories])
+  self.category_embeddings = {}
+  self.trigger_embeddings = {}
+
+  for cat, props in self.categories.items():
+      description = props.get("description", "")
+      self.category_embeddings[cat] = embed_text(description)
+
+      triggers = props.get("escalation_triggers", [])
+      self.trigger_embeddings[cat] = [embed_text(t) for t in triggers]
   ````
 * **Prediction**:
 
   ````python
-  # Embed incoming request
-  request_emb = embed_text([user_text])[0]
-  # Compute cosine similarities
-  sims = cosine_similarity(request_emb, self.category_embeddings)
-  best_idx = np.argmax(sims)
-  label, confidence = categories[best_idx]["name"], sims[best_idx]
+  text_emb = embed_text(text)
+
+  # Classify via semantic similarity to category description
+  similarities = {
+      cat: cosine_similarity([text_emb], [emb])[0][0]
+      for cat, emb in self.category_embeddings.items()
+  }
+  label = max(similarities, key=similarities.get)
+  confidence = similarities[label]
+
+  # Check escalation
+  escalate = self._should_escalate(label, text_emb, confidence)
+
+  return label, confidence, escalate
   ````
 * **Escalation Check**:
 
   ````python
-  def _should_escalate(self, emb):
-      if max_similarity < threshold:
+  # High semantic similarity to any escalation trigger
+  trigger_embs = self.trigger_embeddings.get(label, [])
+  for trig_emb in trigger_embs:
+      trig_sim = cosine_similarity([text_emb], [trig_emb])[0][0]
+      if trig_sim >= self.trigger_threshold:
           return True
-      # Check trigger embeddings
-      trig_sims = cosine_similarity(emb, self.trigger_embeddings)
-      return any(trig_sims >= trigger_threshold)
+
+  return False
   ````
 
 ---
@@ -305,7 +185,6 @@ This document provides a focused overview of how each core component in the help
 
 * **LLM Call**:
 
-  * **File**: `app/services/generator.py`
   * **Code**:
 
   ````python
@@ -326,4 +205,154 @@ This document provides a focused overview of how each core component in the help
 * **Details**: Implemented in the `_should_escalate()` method, checking both confidence and trigger thresholds as described above.  
 
 ---
+
+## Prerequisites
+
+* **Python 3.10+**
+* **git**, **pip**, and a virtual environment tool
+* **OpenAI**
+* **FastAPI**
+* **Faiss**
+
+## Installation
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/micheal0034/helpdesk-system.git
+   
+   cd helpdesk-system
+   ```
+
+2. **Create & Activate Virtual Environment**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate    # macOS/Linux
+   venv\Scripts\activate     # Windows
+   ```
+3. **Install Dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Configuration
+
+1. **Create a `.env` file** in the project root with the following keys:
+
+   ```ini
+   AZURE_OPENAI_NAME="AzureAI"
+   AZURE_DEPLOYMENT_NAME="<your-deployment-name>"
+   AZURE_OPENAI_KEY="<your-key>"
+   AZURE_OPENAI_ENDPOINT="https://<your-endpoint>.openai.azure.com"
+   AZURE_OPENAI_API_VERSION="2023-09-01-preview"
+   INDEX_PATH="data/faiss.index"
+   CATEGORIES_PATH="app/models/categories.json"
+   DATA_DIR="uploads"
+   ```
+2. **Verify Settings Loader**
+   The `app/core/config.py` script will load and validate all required vars on startup.
+
+## Building the Knowledge Index
+
+Before serving requests, build the FAISS index:
+
+```bash
+python run_indexer.py
+```
+
+This will scan `data/*.md` and `data/*.json`, chunk text, embed, and write `data/faiss.index` and its metadata.
+
+## Running the Application
+
+### Local Development
+
+1. **Start the FastAPI Server**
+
+   ```bash
+   uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
+   ```
+2. **Access the API**
+
+   * Swagger UI: `http://localhost:8001/docs`
+   * Redoc: `http://localhost:8001/redoc`
+
+### Online Deplyment
+
+Live app Usage: `https://helpdesk-system-three.vercel.app/`
+
+## API Usage
+
+### Endpoints
+
+- **POST** `/classify`
+  - Payload: `{ "text": "Issue description" }`
+  - Response: `ClassificationResult` JSON
+
+- **POST** `/retrieve`
+  - Payload: `{ "text": "Your query" }`
+  - Response: `RetrievalResult` snippets
+
+- **POST** `/helpdesk`
+  - Payload: `{ "text": "Help me with ..." }`
+  - Response: `HelpResponse` containing classification, snippets, and answer
+
+### Example (cURL)
+```bash
+curl -X POST http://localhost:8001/helpdesk \
+     -H "Content-Type: application/json" \
+     -d '{"text":"I forgot my password"}'
+````
+
+## Testing
+
+Run the full test suite with pytest:
+
+```bash
+pytest -q
+```
+
+**Test Results**:
+
+````
+============================= test session starts =============================
+collected 6 items
+
+tests/test_helpdesk_service.py .                                        [ 20%]
+tests/test_retriever.py .                                               [ 40%]
+tests/test_api.py .                                                     [ 60%]
+tests/test_classifier.py .                                              [ 80%]
+tests/test_generator.py .                                               [100%]
+
+============================== 6 passed in 0.73s ==============================
+````
+
+## Logging & Monitoring
+
+- **Structured Logging**: Standard Python `logging` configured in each component.
+- **Timing Metrics**: Each pipeline stage logs duration for performance tuning.
+- **Log Level**: Set `LOG_LEVEL` in environment (default INFO).
+
+## Troubleshooting
+
+- **Index Not Found**: Ensure `data/faiss.index` exists or rebuild via `build_index.py`.
+- **Env Vars Missing**: Review `.env` and confirm keys; startup will error if required vars are unset.
+- **Azure Errors**: Verify deployment name and key in Azure portal.
+
+## Contributing
+
+1. Fork the repo and create a feature branch.
+2. Write tests for new functionality.
+3. Submit a pull request with clear descriptions.
+
+## License
+
+This project is licensed under the MIT License.
+
+
+
+
+
+
 
