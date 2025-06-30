@@ -7,7 +7,11 @@
 
 **Live app Link:**  [https://helpdesk-system-three.vercel.app/](https://helpdesk-system-three.vercel.app/)
 ---
-<video controls src="bandicam 2025-06-30 08-17-29-776.mp4" title="Title"></video>
+
+
+
+https://github.com/user-attachments/assets/f72e4cbf-b616-44e1-952e-3c9a002722fd
+
 
 
 # Intelligent Help Desk System
